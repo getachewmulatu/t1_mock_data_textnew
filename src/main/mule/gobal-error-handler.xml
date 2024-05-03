@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<error-handler name="gobal-error-handler" doc:id="105363f3-71c8-4704-a5c5-f02c669f0463" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c61e975d-5d0d-4e8b-8780-daccbb4e608c" type="DATA:INTERNAL_RECORDS">
+			<logger level="INFO" doc:name="Entry Logger" doc:id="f2521048-ce0f-469f-aa62-7cadf4ba2cbd" message="Entry :: DATA:INTERNAL_RECORDS error handling"/>
+			<ee:transform doc:name="Transform Message" doc:id="430289b4-0205-484f-bb2a-5c3af33c5437" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="fileName" ><![CDATA[Mule::p('file.errorPath') ++ "Error_Internal_" ++ (now() as String{format : "dd-MM-yyyy HH-mm-ss-SSS" }) ++ ".csv"]]></ee:set-variable>
+					<ee:set-variable variableName="internalRecordsResponse" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Message : "Internal Records",
+	TotalRecords : sizeOf(payload)
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="file-write-operation-flow" doc:id="620e9c57-7f43-4904-a69d-d757f1ac3dae" name="file-write-operation-flow"/>
+			<logger level="INFO" doc:name="Exit Logger" doc:id="d7bb9bd6-a899-4f3b-b340-4896f2311bea" message="Exit :: DATA:INTERNAL_RECORDS error handling"/>
+		</on-error-continue>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="244c3134-ff26-47c4-8876-6f381888e2d1" type="SALESFORCE:CONNECTIVITY,FILE:CONNECTIVITY">
+			<logger level="INFO" doc:name="Entry Logger" doc:id="b2e59fe4-0651-4452-a6a0-3154c52ee50b" message="Entry :: Connectivity error handling" />
+			<set-variable value="#[502]" doc:name="Set Variable" doc:id="4390cc9d-1af1-443a-89d8-cfebdc6bdc7d" variableName="httpStatus"/>
+			<flow-ref doc:name="error-formatting-flow" doc:id="eac5ff73-2e13-401c-a07a-62e8e66746e1" name="error-formatting-flow"/>
+			<logger level="INFO" doc:name="Exit Logger" doc:id="61ab05a4-05f8-4ae8-bcaa-76e829cba2e2" message="Exit ::  Connectivity error handling" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c5e107df-9f58-408d-9eaf-f51b04aa668c" type="MULE:EXPRESSION">
+			<logger level="INFO" doc:name="Entry Logger" doc:id="a59bd404-a17c-4455-aa97-0b399e86832b" message="Entry :: Mule Expression error handling" />
+			<set-variable value="#[500]" doc:name="Set Variable" doc:id="7d001255-a770-464c-9b6a-b648cdf4b0c4" variableName="httpStatus"/>
+			<flow-ref doc:name="error-formatting-flow" doc:id="d6b3a48e-d66f-4f58-bd87-db0dc3803b56" name="error-formatting-flow" />
+			<logger level="INFO" doc:name="Exit Logger" doc:id="457381af-9cdb-478f-943b-ba09496c9e3f" message="Exit :: Mule Expression error handling" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="74a10a19-4833-4227-a56d-c3750943eb34" type="SALESFORCE:RETRY_EXHAUSTED,FILE:RETRY_EXHAUSTED">
+			<logger level="INFO" doc:name="Entry Logger" doc:id="fcf6f7b8-e513-4c97-ad09-19137eacf1d8" message="Entry :: Retry exhausted error handling" />
+			<set-variable value="#[429]" doc:name="Set Variable" doc:id="558b31ad-1e84-411a-ab5a-7e371922d6c3" variableName="httpStatus" />
+			<flow-ref doc:name="error-formatting-flow" doc:id="b5c80632-bc12-448a-9787-2324cc4b6cb9" name="error-formatting-flow" />
+			<logger level="INFO" doc:name="Exit Logger" doc:id="d0eea87c-05f6-44f5-9a20-84571190cd41" message="Exit :: Retry Exhausted error handling" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="eaf9372f-1da1-405b-832b-ac929f602330" type="SALESFORCE:TIMEOUT">
+			<logger level="INFO" doc:name="Entry Logger" doc:id="4a768787-394c-4349-9a7a-76586b1631ef" message="Entry :: Timeout error handling" />
+			<set-variable value="#[408]" doc:name="Set Variable" doc:id="dae52a6e-aaa7-4834-9b81-714546439339" variableName="httpStatus" />
+			<flow-ref doc:name="error-formatting-flow" doc:id="79189f09-8d97-4381-bc79-dcd0a84817e0" name="error-formatting-flow" />
+			<logger level="INFO" doc:name="Exit Logger" doc:id="76038a47-5665-4473-9229-6edcc9a5281e" message="Exit :: Timeout error handling" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d1bc171d-4844-4089-afe8-4962a70e255e" type="SALESFORCE:INVALID_INPUT,FILE:ILLEGAL_PATH,FILE:ILLEGAL_CONTENT,SALESFORCE:INVALID_RESPONSE">
+			<logger level="INFO" doc:name="Entry Logger" doc:id="30a18a25-bf4a-49bf-b4b6-86b6ac37697b" message="Entry :: Invalid input/path error handling" />
+			<set-variable value="#[404]" doc:name="Set Variable" doc:id="0855717a-7cfd-44a8-8053-5e87873d3e0c" variableName="httpStatus" />
+			<flow-ref doc:name="error-formatting-flow" doc:id="6f00cfb9-9105-4d32-aa5d-c56e588189ba" name="error-formatting-flow" />
+			<logger level="INFO" doc:name="Exit Logger" doc:id="8cf447b9-74b8-4209-bf20-e327083bcfd3" message="Exit :: Invalid input/path error handling" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3821a243-9f7f-4de7-9e50-c98ff879ac16" type="SALESFORCE:MUTUAL_AUTHENTICATION_FAILED,FILE:ACCESS_DENIED">
+			<logger level="INFO" doc:name="Entry Logger" doc:id="0fd99fe0-aae3-4e04-b080-739f9335bc49" message="Entry :: Authorization error handling" />
+			<set-variable value="#[401]" doc:name="Set Variable" doc:id="884fd3b6-c3ea-4cd9-8bdf-aeb33ea5e738" variableName="httpStatus" />
+			<flow-ref doc:name="error-formatting-flow" doc:id="fd128b6c-09a3-46ce-a1a5-cea26a027c05" name="error-formatting-flow" />
+			<logger level="INFO" doc:name="Exit Logger" doc:id="e4f276e8-24ca-4b2d-b45b-4aefa0777523" message="Exit :: Authorization error handling" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2881afa9-bdd5-4b22-b9b5-cbc2a52d5787" type="SALESFORCE:NOT_FOUND">
+			<logger level="INFO" doc:name="Entry Logger" doc:id="5d4a3323-e910-4b53-a899-4caf7422a44b" message="Entry :: Not Found error handling" />
+			<set-variable value="#[404]" doc:name="Set Variable" doc:id="5a02ac70-cedb-4589-8722-9a010a5292ca" variableName="httpStatus" />
+			<flow-ref doc:name="error-formatting-flow" doc:id="37eb489f-e3ec-4230-bde4-ea673a3c86ee" name="error-formatting-flow" />
+			<logger level="INFO" doc:name="Exit Logger" doc:id="03382634-96b7-4a50-9b7e-36aac2af6eba" message="Exit :: Not Found error handling" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8a1ca08d-de53-42af-b2e0-a1ab81059125" type="ANY">
+			<logger level="INFO" doc:name="Entry Logger" doc:id="45879682-ab85-41bd-aa60-19ba13ee25e0" message="Entry :: Error handling" />
+			<set-variable value="#[500]" doc:name="Set Variable" doc:id="b1c2c508-7382-4c2a-ba78-85632042e4f7" variableName="httpStatus" />
+			<flow-ref doc:name="error-formatting-flow" doc:id="9aaac190-0d34-4e62-9296-95cdc780591e" name="error-formatting-flow" />
+			<logger level="INFO" doc:name="Exit Logger" doc:id="7995f7e3-04a5-4ee4-85bf-d0516f6c7917" message="Exit :: Error handling" />
+		</on-error-propagate>
+	</error-handler>
+	<sub-flow name="error-formatting-flow" doc:id="3a81f603-b332-412a-8737-5adef022b673" >
+		<ee:transform doc:name="Transform Message" doc:id="6ed77724-6736-4c58-8f20-70887da9b122" >
+			<ee:message >
+				<ee:set-payload resource="dwl/errorMapping.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

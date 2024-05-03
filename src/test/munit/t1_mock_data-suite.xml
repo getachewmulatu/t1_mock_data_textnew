@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="t1_mock_data-suite.xml" />
+	<munit:test name="t1_mock_data-main-flow-success" doc:id="448c4648-6a03-4bc5-9b92-9ae32d1389bc" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock internal-records-handling-flow" doc:id="be395757-466c-4a32-af57-bfe346b414c9" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="33fab818-ea60-4321-aaa8-1e079621d835" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/csv separator=&quot;,&quot; --- readUrl('classpath://t1mockdatamainflowsuccess\mock_payload.dwl')]" mediaType='application/csv separator=","' encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://t1mockdatamainflowsuccess\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="fileName" value="#[output application/java --- readUrl('classpath://t1mockdatamainflowsuccess\mock_variable_.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="internalRecordsResponse" value="#[output application/json --- readUrl('classpath://t1mockdatamainflowsuccess\mock_variable_1.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="ace00d53-283b-4320-82f5-7c8387c2ab09" >
+				<munit:payload value="#[readUrl('classpath://t1mockdatamainflowsuccess\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://t1mockdatamainflowsuccess\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to t1_mock_data-main-flow" doc:id="079f61b7-84cd-4d69-b6b6-a16f6315e996" name="t1_mock_data-main-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="a204b9d2-d156-476f-ad57-321d16688ab7" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import t1mockdatamainflowsuccess::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="t1_mock_data-main-flow-test" doc:id="24c0686a-3be4-49d1-8651-fda835ce6bc5" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock RFI-and-Oracle-records-handling-flow" doc:id="88937bf0-103a-4b23-a2aa-89d7f7fa81b6" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9bf3ecf8-7941-4362-9619-73a1cf3c521a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json  --- readUrl('classpath://t1mockdatamainflowtest\mock_payload.dwl')]" mediaType="application/json " encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://t1mockdatamainflowtest\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="fileName" value="#[output application/java --- readUrl('classpath://t1mockdatamainflowtest\mock_variable_.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="75a0c3c3-0302-4862-a040-118a0dfdee11" >
+				<munit:payload value="#[readUrl('classpath://t1mockdatamainflowtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://t1mockdatamainflowtest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to t1_mock_data-main-flow" doc:id="9a3abc44-87bd-43fd-8bed-1347ef3a48a6" name="t1_mock_data-main-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="d984fdb4-8d4e-421b-b116-2c7016c4d6ed" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import t1mockdatamainflowtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

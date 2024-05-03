@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<sub-flow name="salesforce-bulk-insert-flow" doc:id="342e1fcf-39d9-41ce-a842-6a4a98a10ddf" >
+		<logger level="INFO" doc:name="Entry Logger" doc:id="7d70fe6d-b378-4527-ac25-e13eee0e8f21" message="Entry :: Bulk insert flow"/>
+		<salesforce:create-job-bulk-api-v2 objectType="Contact" operation="upsert" doc:name="Upsert bulk data" doc:id="884e0127-4985-4f23-901c-97c2f691eacb" config-ref="Salesforce_Config" lineEnding="CRLF" externalIdFieldName="Id"/>
+		<logger level="INFO" doc:name="Exit Logger" doc:id="298e8546-ff59-41ce-b012-3fd08a9d1612" message="Entry :: Bulk insert flow"/>
+	</sub-flow>
+	<sub-flow name="salesforce-retrieve-job-succesful-records" doc:id="c7afad40-e5ae-4ae1-8e08-a4533402dc8a" >
+		<logger level="INFO" doc:name="Entry Logger" doc:id="b48bd2e9-c067-45e1-a95d-0c80b77be85a" message="Entry :: Retrieve succesful records from salesforce"/>
+		<salesforce:retrieve-job-successful-results-bulk-v2 doc:name="Retrieve job successful results bulk v 2" doc:id="330bd8bc-738a-4180-b6d0-78aeddc7d3fd" config-ref="Salesforce_Config" id="#[vars.id]" target="successRecords"/>
+		<logger level="INFO" doc:name="Exit Logger" doc:id="c769f43a-8425-4edd-9252-b73bce925afe" message="Exit :: Retrieve succesful records from salesforce"/>
+	</sub-flow>
+	<sub-flow name="salesforce-retrieve-job-failed-records" doc:id="94281ebc-cd3e-4f02-92a4-90b6e4f6e80f" >
+		<logger level="INFO" doc:name="Entry Logger" doc:id="b1414344-314f-4721-9ee0-cd14f0791c24" message="Entry :: Retrieve failed records from salesforce"/>
+		<salesforce:retrieve-job-failed-results-bulk-v2 doc:name="Retrieve job failed results bulk v 2" doc:id="ad8902b6-4a7b-4897-a541-f1d7cbdadeb5" config-ref="Salesforce_Config" id="#[vars.id]" target="failedRecords"/>
+		<logger level="INFO" doc:name="Exit Logger" doc:id="9ff78736-f080-4b8c-98b1-9d9a6e9a3d11" message="Exit :: Retrieve failed records from salesforce"/>
+	</sub-flow>
+</mule>

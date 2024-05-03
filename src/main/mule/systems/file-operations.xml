@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="file-write-operation-flow" doc:id="b442b006-6f14-4637-ac0b-926f9706d287" >
+		<logger level="INFO" doc:name="Entry Logger" doc:id="8dc6dafc-dd16-40a6-a984-0316bfdae5d7" message="Entry :: File write operation flow"/>
+		<file:write doc:name="Write" doc:id="02ecc7cf-3f7c-4d46-bf20-5a88698b22b4" path='#[vars.fileName]' config-ref="File_Config" mode="CREATE_NEW"/>
+		<logger level="INFO" doc:name="Exit Logger" doc:id="20580dcc-4529-4f96-8715-079fc7480876" message="Exit :: File write operation flow"/>
+	</sub-flow>
+	<sub-flow name="file-read-operation-flow" doc:id="3e320c45-a9fe-460e-8e74-fd381a71072f" >
+		<logger level="INFO" doc:name="Entry Logger" doc:id="af0be6ba-c33a-408c-bd97-76893cdc9aff" message="Entry :: File read operation flow" />
+		<file:read doc:name="Read" doc:id="85e575c9-9ff1-40be-8588-da4d766d5aa8" config-ref="File_Config" path="#[vars.fileName]" outputMimeType='application/csv; escape="\\"; separator="\\t"; header=true' />
+		<logger level="INFO" doc:name="Exit Logger" doc:id="841e0f58-0fbe-408c-8e34-7850fe33a10b" message="Exit :: File read operation flow" />
+	</sub-flow>
+</mule>

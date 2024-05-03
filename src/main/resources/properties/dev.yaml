@@ -1,0 +1,9 @@
+salesforce:
+  username : "![D+pBfGLaSTtvIfWoKNsQ7xtfuzfFVCOj]"
+  password : "![d6DW8RJZb7j9EpGSoY0rEw==]"
+  securityToken : "![jBKt1W1OmOCF+ss7JPfU1odlGR0dOpK8tMw4NiI+QfA=]" 
+  
+file:
+  errorPath : "error/"
+  outputPath : "output/"
+  working.directory : "C:/"
