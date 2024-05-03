@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ee8ec8e5-5386-4c40-ac7f-97b0e44f9e65" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="091ef117-f815-4e2a-bb3c-d7ff6252b8ba" >
+		<file:connection workingDir="${file.working.directory}"/>
+	</file:config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="646e6a37-10c6-40a5-841c-bf0e8954cb0e" >
+		<salesforce:basic-connection username="${secure::salesforce.username}" password="${secure::salesforce.password}" securityToken="${secure::salesforce.securityToken}" />
+	</salesforce:sfdc-config>
+	<configuration doc:name="Configuration" doc:id="241cef84-aab9-4608-ab52-d0c73b46f279" defaultErrorHandler-ref="gobal-error-handler" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="894ba7c8-7d03-4956-830d-504ed2cf8cfe" file="properties/${env}.yaml" key="${encryption.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<global-property doc:name="Global Property" doc:id="7dd0cdde-5f87-44e4-8965-c8d831f7bf99" name="env" value="dev" />
+	<configuration-properties doc:name="Configuration properties" doc:id="d7d81985-c90d-41e5-a427-cf025eaa8410" file="properties/common.yaml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="a60624b4-3e63-465e-9f5c-ace98e49ea9f" file="properties/${env}.yaml" />
+	<global-property doc:name="Global Property" doc:id="6c3e5be0-db80-4099-877c-4cf5c7ba0591" name="encryption.key" value="mulesoft"/>
+	<api-gateway:autodiscovery apiId="19454327" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="31fe3aa2-9515-47c4-be15-8ebcbb00155a" flowRef="t1_mock_data-main-flow" />
+</mule>

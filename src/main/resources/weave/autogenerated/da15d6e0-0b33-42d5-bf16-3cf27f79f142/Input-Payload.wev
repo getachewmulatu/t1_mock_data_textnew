@@ -1,0 +1,6 @@
+%dw 2.0
+
+type auto_da15d6e0_0b33_42d5_bf16_3cf27f79f142_Input_Payload = Binary {"escape": "\\\\",
+"header": "true",
+"separator": "\\\\t"}
+
